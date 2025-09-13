@@ -36,12 +36,12 @@ class Constraint:
 @dataclass
 class ValidationIssue:
     """Individual validation issue"""
-    severity: str
+    level: str  # Changed from severity to level for consistency
     message: str
-    field: str
-    value: any
-    constraint: str
-    suggestion: Optional[str] = None
+    field_path: str  # Changed from field to field_path for consistency
+    value: any = None
+    constraint: str = None
+    suggested_fix: Optional[str] = None
 
 
 class EnhancedDataValidator:
@@ -620,15 +620,180 @@ class EnhancedDataValidator:
         
         return issues
     
+    def _validate_agent_availability_balance(self, data: Dict, constraint: Constraint, prefix: str) -> List[ValidationIssue]:
+        """Validate agent availability balance"""
+        issues = []
+        
+        if 'agents' not in data:
+            return issues
+        
+        agents = data['agents']
+        if not agents:
+            return issues
+        
+        # Count availability statuses
+        availability_counts = {}
+        for agent in agents:
+            status = agent.get('availability_status', 'Unknown')
+            availability_counts[status] = availability_counts.get(status, 0) + 1
+        
+        total_agents = len(agents)
+        available_agents = availability_counts.get('Available', 0)
+        availability_ratio = available_agents / total_agents if total_agents > 0 else 0
+        
+        # Check if at least 60% of agents are available
+        if availability_ratio < 0.6:
+            issues.append(ValidationIssue(
+                level="warning",
+                message=f"Only {availability_ratio:.1%} of agents are available (minimum recommended: 60%)",
+                field_path=f"{prefix}.agents.availability_status",
+                suggested_fix="Ensure adequate agent availability for ticket assignment"
+            ))
+        
+        return issues
+    
+    def _validate_workload_distribution(self, data: Dict, constraint: Constraint, prefix: str) -> List[ValidationIssue]:
+        """Validate workload distribution among agents"""
+        issues = []
+        
+        if 'agents' not in data:
+            return issues
+        
+        agents = data['agents']
+        if not agents:
+            return issues
+        
+        # Check workload distribution
+        workloads = []
+        overloaded_agents = 0
+        
+        for agent in agents:
+            current_load = agent.get('current_load', 0)
+            workloads.append(current_load)
+            
+            if current_load > 10:  # Threshold for overloaded
+                overloaded_agents += 1
+        
+        if overloaded_agents > len(agents) * 0.3:  # More than 30% overloaded
+            issues.append(ValidationIssue(
+                level="warning",
+                message=f"{overloaded_agents} agents are overloaded (>10 tickets), which is {overloaded_agents/len(agents):.1%} of total",
+                field_path=f"{prefix}.agents.current_load",
+                suggested_fix="Redistribute workload or add more agents"
+            ))
+        
+        return issues
+    
+    def _validate_skill_coverage(self, data: Dict, constraint: Constraint, prefix: str) -> List[ValidationIssue]:
+        """Validate skill coverage across agents"""
+        issues = []
+        
+        if 'agents' not in data:
+            return issues
+        
+        agents = data['agents']
+        if not agents:
+            return issues
+        
+        # Collect all skills
+        all_skills = set()
+        skill_counts = {}
+        
+        for agent in agents:
+            skills = agent.get('skills', {})
+            for skill, level in skills.items():
+                all_skills.add(skill)
+                if level >= 7:  # High skill level
+                    skill_counts[skill] = skill_counts.get(skill, 0) + 1
+        
+        # Check for skills with no high-level coverage
+        uncovered_skills = []
+        for skill in all_skills:
+            if skill_counts.get(skill, 0) == 0:
+                uncovered_skills.append(skill)
+        
+        if uncovered_skills:
+            issues.append(ValidationIssue(
+                level="warning",
+                message=f"Skills with no high-level (≥7) coverage: {', '.join(uncovered_skills)}",
+                field_path=f"{prefix}.agents.skills",
+                suggested_fix="Ensure adequate skill coverage by training agents or hiring specialists"
+            ))
+        
+        return issues
+    
+    def _validate_ticket_priority_distribution(self, data: Dict, constraint: Constraint, prefix: str) -> List[ValidationIssue]:
+        """Validate ticket priority distribution"""
+        issues = []
+        
+        if 'tickets' not in data:
+            return issues
+        
+        tickets = data['tickets']
+        if not tickets:
+            return issues
+        
+        # Analyze titles and descriptions for priority keywords
+        try:
+            # Simple keyword analysis without importing priority_analyzer to avoid circular imports
+            priority_keywords = {
+                'CRITICAL': ['down', 'outage', 'critical', 'emergency', 'security breach', 'crashed'],
+                'HIGH': ['broken', 'failing', 'not working', 'error', 'urgent', 'problem'],
+                'MEDIUM': ['help', 'request', 'setup', 'configure', 'support', 'issue'],
+                'LOW': ['enhancement', 'feature request', 'optimization', 'when possible']
+            }
+            
+            priority_counts = {'CRITICAL': 0, 'HIGH': 0, 'MEDIUM': 0, 'LOW': 0}
+            
+            for ticket in tickets:
+                title = ticket.get('title', '').lower()
+                description = ticket.get('description', '').lower()
+                text = f"{title} {description}"
+                
+                # Determine priority based on keywords
+                priority = 'LOW'  # Default
+                for level, keywords in priority_keywords.items():
+                    if any(keyword in text for keyword in keywords):
+                        priority = level
+                        break
+                
+                priority_counts[priority] += 1
+            
+            total_tickets = len(tickets)
+            critical_ratio = priority_counts['CRITICAL'] / total_tickets if total_tickets > 0 else 0
+            
+            # Check if too many critical tickets (might indicate poor categorization)
+            if critical_ratio > 0.3:
+                issues.append(ValidationIssue(
+                    level="warning",
+                    message=f"{critical_ratio:.1%} of tickets are CRITICAL priority (expected <30%)",
+                    field_path=f"{prefix}.tickets.priority_distribution",
+                    suggested_fix="Review ticket priority classification criteria"
+                ))
+            
+        except Exception as e:
+            # If priority analysis fails, skip this validation
+            pass
+        
+        return issues
+    
     def _add_issues(self, result: Dict, issues: List[ValidationIssue]):
         """Add issues to validation result"""
         for issue in issues:
-            result['issues'][issue.severity].append({
+            # Map issue level to result categories
+            level_mapping = {
+                'error': 'errors',
+                'warning': 'warnings', 
+                'info': 'info'
+            }
+            
+            category = level_mapping.get(issue.level, 'info')
+            result['issues'][category].append({
                 'message': issue.message,
-                'field': issue.field,
+                'field': issue.field_path,
                 'value': issue.value,
                 'constraint': issue.constraint,
-                'suggestion': issue.suggestion
+                'suggestion': issue.suggested_fix
             })
     
     def _calculate_quality_score(self, result: Dict) -> float:

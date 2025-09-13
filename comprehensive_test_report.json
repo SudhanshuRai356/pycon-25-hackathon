@@ -1,0 +1,308 @@
+{
+  "test_timestamp": "2025-09-13T17:49:58.288694",
+  "test_summary": {
+    "validation_tests": 5,
+    "priority_tests": 8,
+    "assignment_tests": 4,
+    "performance_tests": 3,
+    "edge_case_tests": 4
+  },
+  "detailed_results": {
+    "validation_tests": [
+      {
+        "scenario": "Normal Dataset",
+        "is_valid": true,
+        "error_count": 0,
+        "warning_count": 2,
+        "quality_score": 83.0,
+        "validation_time": 0.0020265579223632812,
+        "recommendations_count": 1
+      },
+      {
+        "scenario": "Specialized Agents",
+        "is_valid": true,
+        "error_count": 0,
+        "warning_count": 11,
+        "quality_score": 55.0,
+        "validation_time": 0.001001119613647461,
+        "recommendations_count": 3
+      },
+      {
+        "scenario": "Critical Heavy Tickets",
+        "is_valid": true,
+        "error_count": 0,
+        "warning_count": 1,
+        "quality_score": 89.0,
+        "validation_time": 0.0012295246124267578,
+        "recommendations_count": 1
+      },
+      {
+        "scenario": "Unavailable Agents",
+        "is_valid": false,
+        "error_count": 1,
+        "warning_count": 5,
+        "quality_score": 64.0,
+        "validation_time": 0.0014274120330810547,
+        "recommendations_count": 4
+      },
+      {
+        "scenario": "Edge Cases",
+        "is_valid": false,
+        "error_count": 19,
+        "warning_count": 11,
+        "quality_score": 0.0,
+        "validation_time": 0.0,
+        "recommendations_count": 4
+      }
+    ],
+    "priority_tests": [
+      {
+        "title": "Server completely down",
+        "expected": "CRITICAL",
+        "predicted": "CRITICAL",
+        "correct": true,
+        "score": 10.0,
+        "keywords_expected": 2,
+        "keywords_found": 1,
+        "keywords_detected": [
+          "down",
+          "multiple users",
+          "need"
+        ]
+      },
+      {
+        "title": "Email not working for user",
+        "expected": "HIGH",
+        "predicted": "HIGH",
+        "correct": true,
+        "score": 11.0,
+        "keywords_expected": 2,
+        "keywords_found": 1,
+        "keywords_detected": [
+          "not working",
+          "multiple users",
+          "need"
+        ]
+      },
+      {
+        "title": "Need help with setup",
+        "expected": "MEDIUM",
+        "predicted": "MEDIUM",
+        "correct": true,
+        "score": 6.0,
+        "keywords_expected": 2,
+        "keywords_found": 2,
+        "keywords_detected": [
+          "multiple users",
+          "help",
+          "setup",
+          "need"
+        ]
+      },
+      {
+        "title": "Feature request for enhancement",
+        "expected": "LOW",
+        "predicted": "HIGH",
+        "correct": false,
+        "score": 5.0,
+        "keywords_expected": 2,
+        "keywords_found": 2,
+        "keywords_detected": [
+          "multiple users",
+          "request",
+          "need",
+          "enhancement",
+          "feature request"
+        ]
+      },
+      {
+        "title": "URGENT: Production database crashed!",
+        "expected": "CRITICAL",
+        "predicted": "CRITICAL",
+        "correct": true,
+        "score": 42.5,
+        "keywords_expected": 4,
+        "keywords_found": 2,
+        "keywords_detected": [
+          "crashed",
+          "urgent",
+          "multiple users",
+          "need"
+        ]
+      },
+      {
+        "title": "Printer ink needs replacing",
+        "expected": "MEDIUM",
+        "predicted": "HIGH",
+        "correct": false,
+        "score": 8.0,
+        "keywords_expected": 2,
+        "keywords_found": 1,
+        "keywords_detected": [
+          "multiple users",
+          "printer",
+          "need"
+        ]
+      },
+      {
+        "title": "Security breach detected immediately",
+        "expected": "CRITICAL",
+        "predicted": "CRITICAL",
+        "correct": true,
+        "score": 36.0,
+        "keywords_expected": 2,
+        "keywords_found": 2,
+        "keywords_detected": [
+          "immediately",
+          "security breach",
+          "multiple users",
+          "need"
+        ]
+      },
+      {
+        "title": "Slow performance on laptop",
+        "expected": "HIGH",
+        "predicted": "HIGH",
+        "correct": true,
+        "score": 16.0,
+        "keywords_expected": 3,
+        "keywords_found": 3,
+        "keywords_detected": [
+          "slow",
+          "performance",
+          "multiple users",
+          "laptop",
+          "need"
+        ]
+      }
+    ],
+    "assignment_tests": [
+      {
+        "scenario": "Balanced Workload",
+        "total_assignments": 20,
+        "assignment_time": 0.0509951114654541,
+        "priority_distribution": {
+          "CRITICAL": 7,
+          "HIGH": 12,
+          "MEDIUM": 1
+        },
+        "load_balance": 0.84,
+        "avg_skill_match": 0.10666666666666666,
+        "agent_utilization": 25.0
+      },
+      {
+        "scenario": "High Priority Focus",
+        "total_assignments": 20,
+        "assignment_time": 0.07547307014465332,
+        "priority_distribution": {
+          "CRITICAL": 14,
+          "HIGH": 5,
+          "MEDIUM": 1
+        },
+        "load_balance": 0.94,
+        "avg_skill_match": 0.14666666666666664,
+        "agent_utilization": 50.0
+      },
+      {
+        "scenario": "Specialized Skills",
+        "total_assignments": 20,
+        "assignment_time": 0.0726003646850586,
+        "priority_distribution": {
+          "CRITICAL": 6,
+          "HIGH": 13,
+          "MEDIUM": 1
+        },
+        "load_balance": 0.32499999999999996,
+        "avg_skill_match": 0.048333333333333325,
+        "agent_utilization": 62.5
+      },
+      {
+        "scenario": "Limited Availability",
+        "total_assignments": 20,
+        "assignment_time": 0.040473222732543945,
+        "priority_distribution": {
+          "CRITICAL": 2,
+          "HIGH": 15,
+          "MEDIUM": 3
+        },
+        "load_balance": 1.0,
+        "avg_skill_match": 0.0,
+        "agent_utilization": 12.5
+      }
+    ],
+    "performance_tests": [
+      {
+        "agent_count": 50,
+        "ticket_count": 100,
+        "validation_time": 0.0050029754638671875,
+        "assignment_time": 1.0828056335449219,
+        "validation_throughput": 19988.10522302707,
+        "assignment_throughput": 92.35267798950858,
+        "total_time": 1.087808609008789
+      },
+      {
+        "agent_count": 100,
+        "ticket_count": 500,
+        "validation_time": 0.023006200790405273,
+        "assignment_time": 11.256727933883667,
+        "validation_throughput": 21733.2711539458,
+        "assignment_throughput": 44.417880838619126,
+        "total_time": 11.279734134674072
+      },
+      {
+        "agent_count": 200,
+        "ticket_count": 1000,
+        "validation_time": 0.03889894485473633,
+        "assignment_time": 36.72100615501404,
+        "validation_throughput": 25707.638182330804,
+        "assignment_throughput": 27.23236928145706,
+        "total_time": 36.759905099868774
+      }
+    ],
+    "edge_case_tests": [
+      {
+        "case": "Empty Dataset",
+        "validation_passed": true,
+        "validation_error": null,
+        "assignment_passed": true,
+        "assignment_error": "Skipped due to invalid data",
+        "assignment_count": 0
+      },
+      {
+        "case": "No Agents",
+        "validation_passed": true,
+        "validation_error": null,
+        "assignment_passed": true,
+        "assignment_error": "Skipped due to invalid data",
+        "assignment_count": 0
+      },
+      {
+        "case": "No Tickets",
+        "validation_passed": true,
+        "validation_error": null,
+        "assignment_passed": true,
+        "assignment_error": "Skipped due to invalid data",
+        "assignment_count": 0
+      },
+      {
+        "case": "All Unavailable Agents",
+        "validation_passed": true,
+        "validation_error": null,
+        "assignment_passed": true,
+        "assignment_error": null,
+        "assignment_count": 1
+      }
+    ]
+  },
+  "performance_summary": {
+    "avg_validation_time": 0.022302707036336262,
+    "max_validation_time": 0.03889894485473633,
+    "avg_assignment_time": 16.35351324081421,
+    "max_assignment_time": 36.72100615501404,
+    "largest_dataset_tested": 1000
+  },
+  "recommendations": [
+    "Consider refining priority analysis keywords for better accuracy",
+    "Consider optimization for large datasets (>10s processing time)"
+  ]
+}
